@@ -1,15 +1,13 @@
-import {RouteConstants, StatusConstants} from '@/constants';
+import {MessageConstant, RouteConstants, StatusConstants} from '@/constants';
 import {PublicRoute} from '@/decorators';
 import {Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards} from '@nestjs/common';
 import {ApiBody, ApiProperty, ApiTags} from '@nestjs/swagger';
-import {SkipThrottle} from '@nestjs/throttler';
 import {Request, Response} from 'express';
 import {AuthService} from './auth.service';
 import {LoginDTO, RegisterDTO} from './dto';
 import {LocalGuard, RefreshGuard} from './guards';
 @PublicRoute()
 @ApiTags(RouteConstants.AUTH)
-@SkipThrottle()
 @Controller(RouteConstants.AUTH)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -29,11 +27,17 @@ export class AuthController {
   @UseGuards(LocalGuard)
   async login(@Res() res: Response, @Req() req: Request) {
     try {
-      return res.status(HttpStatus.OK).json({
-        message: StatusConstants.SUCCESS,
-        data: req.user,
-        statusCode: HttpStatus.OK,
-      });
+      const user = req.user;
+
+      return res
+        .status(HttpStatus.OK)
+        .json({
+          message: MessageConstant.LOGIN_SUCCESS,
+          data: user,
+          statusCode: HttpStatus.OK,
+          status: StatusConstants.SUCCESS,
+        })
+        .end();
     } catch (e) {
       throw e;
     }
@@ -51,15 +55,19 @@ export class AuthController {
   })
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Res() res: Response, @Req() req: Request, @Body() body: RegisterDTO) {
+  async register(@Res() res: Response, @Body() body: RegisterDTO) {
     try {
       const user = await this.authService.register(body);
 
-      return res.status(HttpStatus.CREATED).json({
-        message: StatusConstants.SUCCESS,
-        data: user,
-        statusCode: HttpStatus.CREATED,
-      });
+      return res
+        .status(HttpStatus.CREATED)
+        .json({
+          data: user,
+          statusCode: HttpStatus.CREATED,
+          message: MessageConstant.REGISTER_SUCCESS,
+          status: StatusConstants.SUCCESS,
+        })
+        .end();
     } catch (e) {
       throw e;
     }
@@ -78,10 +86,15 @@ export class AuthController {
   @UseGuards(RefreshGuard)
   @HttpCode(HttpStatus.OK)
   async refresh(@Res() res: Response, @Req() req: Request) {
-    return res.status(HttpStatus.OK).json({
-      message: StatusConstants.SUCCESS,
-      data: req.user,
-      statusCode: HttpStatus.OK,
-    });
+    const user = req.user;
+    return res
+      .status(HttpStatus.OK)
+      .json({
+        message: MessageConstant.TOKEN_CREATED,
+        status: StatusConstants.SUCCESS,
+        data: user,
+        statusCode: HttpStatus.OK,
+      })
+      .end();
   }
 }

@@ -1,21 +1,22 @@
 import {ConfigsService} from '@/configs';
-import {JWT_CONSTANT, MessageConstant, VariableConstant} from '@/constants';
+import {MessageConstant, VariableConstant} from '@/constants';
 import {UserEntity} from '@/entities';
 import {ProviderEnum} from '@/enums';
 import {AccessTokenType, RefreshTokenType} from '@/interfaces';
 import {UserAuthService, UserService} from '@/modules/user';
+import {TokenService} from '@/token';
 import {compareHash} from '@/utils';
 import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/common';
-import {JwtService} from '@nestjs/jwt';
 import {generateFromEmail} from 'unique-username-generator';
 import {RegisterDTO} from './dto';
+import {SecureConstant} from 'secure';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userAuthService: UserAuthService,
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
     private readonly configService: ConfigsService,
   ) {}
 
@@ -54,32 +55,50 @@ export class AuthService {
         throw new UnauthorizedException(MessageConstant.EMAIL_OR_PASSWORD_INCORRECT);
       }
 
-      const [accessToken, refreshToken] = await Promise.all([
-        this.jwtService.sign(
-          {
-            email: user.email,
-            uuid: user.uuid,
-          },
-          {
-            algorithm: 'RS512',
-            encoding: 'base64url',
-            privateKey: this.configService.jwtSecret().privateKey,
-            expiresIn: this.configService.tokenExpiresIn().accessTokenExpiresIn,
-          },
-        ),
-        this.jwtService.signAsync(
-          {
-            email: user.email,
-            uuid: user.uuid,
-          },
-          {
-            algorithm: 'RS256',
-            encoding: 'base64url',
-            privateKey: this.configService.jwtSecret().privateKey,
-            expiresIn: this.configService.tokenExpiresIn().refreshTokenExpiresIn,
-          },
-        ),
-      ]);
+      // const [accessToken, refreshToken] = await Promise.all([
+      //   this.tokenService.signAsymmetricToken(
+      //     {
+      //       email: user.email,
+      //       uuid: user.uuid,
+      //     },
+      //     {
+      //       expiresIn: this.configService.tokenExpiresIn().accessTokenExpiresIn,
+      //     },
+      //   ),
+      //   this.tokenService.signAsymmetricToken(
+      //     {
+      //       email: user.email,
+      //       uuid: user.uuid,
+      //     },
+      //     {
+      //       expiresIn: this.configService.tokenExpiresIn().refreshTokenExpiresIn,
+      //     },
+      //   ),
+      // ]);
+
+      const accessToken = await this.tokenService.signAsymmetricToken(
+        {
+          email: user.email,
+          uuid: user.uuid,
+        },
+        SecureConstant.ACCESS_TOKEN_PRIVATE,
+        {
+          expiresIn: this.configService.tokenExpiresIn().accessTokenExpiresIn,
+          algorithm: 'RS512',
+        },
+      );
+
+      const refreshToken = await this.tokenService.signAsymmetricToken(
+        {
+          email: user.email,
+          uuid: user.uuid,
+        },
+        SecureConstant.REFRESH_TOKEN_PRIVATE,
+        {
+          expiresIn: this.configService.tokenExpiresIn().refreshTokenExpiresIn,
+          algorithm: 'RS512',
+        },
+      );
 
       if (!accessToken || !refreshToken) {
         throw new UnauthorizedException(MessageConstant.TOKEN_FAILED);
@@ -105,30 +124,30 @@ export class AuthService {
       }
 
       const [accessToken, refreshToken] = await Promise.all([
-        this.jwtService.sign(
+        this.tokenService.signAsymmetricToken(
           {
-            client_id: client_id,
+            email: user.email,
             uuid: user.uuid,
           },
+          SecureConstant.ACCESS_TOKEN_PRIVATE,
           {
+            expiresIn: this.configService.tokenExpiresIn().accessTokenExpiresIn,
             algorithm: 'RS512',
             encoding: 'base64url',
-            privateKey: this.configService.jwtSecret().privateKey,
-            expiresIn: this.configService.tokenExpiresIn().accessTokenExpiresIn,
           },
         ),
-        this.jwtService.sign(
+        this.tokenService.signAsymmetricToken(
           {
             uuid: uuid,
             client_id: client_id,
             device: device,
             ip: ip,
           },
+          SecureConstant.REFRESH_TOKEN_PRIVATE,
           {
-            algorithm: 'RS256',
-            encoding: 'base64url',
-            privateKey: this.configService.jwtSecret().privateKey,
             expiresIn: this.configService.tokenExpiresIn().refreshTokenExpiresIn,
+            algorithm: 'RS512',
+            encoding: 'base64url',
           },
         ),
       ]);

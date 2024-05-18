@@ -1,2 +1,2 @@
-export * from './random.util';
-export * from './hash.util';
+export * from './hash';
+export * from './random';

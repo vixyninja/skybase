@@ -59,8 +59,6 @@ import {ConfigsService} from './configs.service';
         // JWT ENV
         ACCESS_TOKEN_EXPIRES_IN: joi.string().required(),
         REFRESH_TOKEN_EXPIRES_IN: joi.string().required(),
-        PRIVATE_KEY: joi.string().required(),
-        PUBLIC_KEY: joi.string().required(),
         SESSION_SECRET_KEY: joi.string().required(),
         COOKIE_SECRET_KEY: joi.string().required(),
 

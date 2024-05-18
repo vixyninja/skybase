@@ -1,5 +1,5 @@
 export enum RouteConstants {
   AUTH = 'auth',
-  USER = 'x',
+  USER = 'user',
   MEDIA = 'media',
 }

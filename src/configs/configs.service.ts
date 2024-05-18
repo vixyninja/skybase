@@ -129,28 +129,6 @@ export class ConfigsService {
 
   /**
    *
-   * @returns {Object} The current JWT secret key
-   * @description This method returns the current JWT secret key
-   */
-  public jwtSecret(): {publicKey: string; privateKey: string; secret: string} {
-    return {
-      publicKey: this.configService.get<string>('PUBLIC_KEY'),
-      privateKey: this.configService.get<string>('PRIVATE_KEY'),
-      secret: this.configService.get<string>('SECRET_KEY'),
-    };
-  }
-
-  /**
-   *
-   * @returns {string} The current JWT issuer
-   * @description This method returns the current JWT issuer
-   */
-  public algorithm(): string {
-    return this.configService.get<string>('ALGORITHM');
-  }
-
-  /**
-   *
    * @returns {Object} The current JWT expires in
    * @description This method returns the current JWT expires in
    */

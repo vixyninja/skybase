@@ -1,6 +1,6 @@
 export type AccessTokenType = {
   uuid: string;
-  client_id: string;
+  email: string;
 };
 
 export type RefreshTokenType = {

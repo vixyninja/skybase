@@ -57,7 +57,6 @@ import {ValidationPipe} from './pipes';
       }),
     }),
     // LoggerModule,
-
     // BUSINESS MODULES
     AuthModule,
     UserModule,
