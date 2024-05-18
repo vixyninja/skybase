@@ -36,4 +36,5 @@ export const MessageConstant = {
   USER_NOT_FOUND: 'User not found',
   USER_NOT_CREATED: 'User not created',
   USER_NOT_UPDATED: 'User not updated',
+  GET_USER_SUCCESS: 'Get user successfully',
 };

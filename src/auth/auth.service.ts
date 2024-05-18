@@ -96,7 +96,7 @@ export class AuthService {
         SecureConstant.REFRESH_TOKEN_PRIVATE,
         {
           expiresIn: this.configService.tokenExpiresIn().refreshTokenExpiresIn,
-          algorithm: 'RS512',
+          algorithm: 'RS256',
         },
       );
 
@@ -133,7 +133,6 @@ export class AuthService {
           {
             expiresIn: this.configService.tokenExpiresIn().accessTokenExpiresIn,
             algorithm: 'RS512',
-            encoding: 'base64url',
           },
         ),
         this.tokenService.signAsymmetricToken(
@@ -146,8 +145,7 @@ export class AuthService {
           SecureConstant.REFRESH_TOKEN_PRIVATE,
           {
             expiresIn: this.configService.tokenExpiresIn().refreshTokenExpiresIn,
-            algorithm: 'RS512',
-            encoding: 'base64url',
+            algorithm: 'RS256',
           },
         ),
       ]);

@@ -1,4 +1,4 @@
-import {RouteConstants} from '@/constants';
+import {MessageConstant, RouteConstants, StatusConstants} from '@/constants';
 import {User} from '@/decorators';
 import {Controller, Get, HttpStatus, Res} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
@@ -16,9 +16,10 @@ export class UserSelfController {
       const user = await this.userService.readUser(uuid);
 
       return res.status(HttpStatus.OK).json({
-        message: 'Get self user success',
+        message: MessageConstant.GET_USER_SUCCESS,
         data: user,
         statusCode: HttpStatus.OK,
+        status: StatusConstants.SUCCESS,
       });
     } catch (e) {
       throw e;
