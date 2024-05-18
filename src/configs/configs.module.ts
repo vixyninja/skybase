@@ -25,11 +25,8 @@ import {ConfigsService} from './configs.service';
         MONGO_PORT: joi.number().required(),
         MONGO_HOST: joi.string().required(),
         MONGO_NAME: joi.string().required(),
-        MONGO_APP_NAME: joi.string().required(),
         MONGO_USER_NAME: joi.string().required(),
         MONGO_USER_PASS: joi.string().required(),
-        MONGO_GUI_USER_NAME: joi.string().required(),
-        MONGO_GUI_USER_PASS: joi.string().required(),
 
         // REDIS ENV
         REDIS_HOST: joi.string().required(),
