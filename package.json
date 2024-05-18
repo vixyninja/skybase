@@ -124,13 +124,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "husky": {
-    "hooks": {
-      "applypatch-msg": "echo \"[HUSKY] applypatch-msg\"",
-      "pre-applypatch": "echo \"[HUSKY] pre-applypatch\"",
-      "post-applypatch": "echo \"[HUSKY] post-applypatch\"",
-      "pre-commit": "echo \"[HUSKY] pre-commit\""
-    }
   }
 }
