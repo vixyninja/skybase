@@ -1,0 +1,94 @@
+volumes:
+  api:
+    name: volume_api
+    driver: local
+  postgres:
+    name: volume_postgres
+    driver: local
+  redis:
+    name: volume_redis
+    driver: local
+  mongo-data:
+    name: volume_mongo
+    driver: local
+
+networks:
+  default:
+    name: byte_blog_network
+    driver: bridge
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    pids_limit: 100
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      TZ: ${TZ}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - default
+
+  api:
+    container_name: api
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: development
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    volumes:
+      - ./:/usr/src/app
+
+  redis:
+    container_name: redis
+    image: redis:alpine3.19
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    networks:
+      - default
+    volumes:
+      - redis:/var/lib/redis/data
+
+  adminer:
+    container_name: adminer
+    image: adminer:latest
+    ports:
+      - ${ADMIN_PORT}:${ADMIN_PORT}
+    depends_on:
+      - postgres
+    environment:
+      ADMINER_PLUGINS: tables-filter tinymce
+      ADMINER_DESIGN: dracula
+    networks:
+      - default
+
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER_NAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_USER_PASS}
+      MONGO_INITDB_DATABASE: ${MONGO_NAME}
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - default
