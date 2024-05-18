@@ -2,7 +2,7 @@ import {BadRequestException, Inject, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {validate} from 'class-validator';
 import {CLOUDINARY_SERVICE} from 'src/constants';
-import {ICloudinary} from '@/lib';
+import {ICloudinary} from '@/libs';
 import {Repository} from 'typeorm';
 import {CreateMediaDTO} from './dtos';
 import {MediaEntity} from './entities';

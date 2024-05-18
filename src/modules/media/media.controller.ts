@@ -14,7 +14,7 @@ import {ThrottlerGuard} from '@nestjs/throttler';
 import {isUUID} from 'class-validator';
 import {Response} from 'express';
 import {CLOUDINARY_SERVICE, RouteConstants} from 'src/constants';
-import {ICloudinary} from '@/lib';
+import {ICloudinary} from '@/libs';
 import {MediaService} from './media.service';
 import {JwtGuard} from '@/auth';
 

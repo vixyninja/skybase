@@ -5,7 +5,6 @@ import {ServeStaticModule} from '@nestjs/serve-static';
 import {ThrottlerGuard, ThrottlerModule} from '@nestjs/throttler';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import * as redisStore from 'cache-manager-redis-store';
-import {ThrottlerStorageRedisService} from 'nestjs-throttler-storage-redis';
 import {join} from 'path';
 import {AuthModule, JwtGuard} from './auth';
 import {ConfigsModule, ConfigsService} from './configs';
@@ -55,10 +54,6 @@ import {ValidationPipe} from './pipes';
             limit: configService.throttleLimit(),
           },
         ],
-        storage: new ThrottlerStorageRedisService({
-          host: configService.redisHost(),
-          port: configService.redisPort(),
-        }),
       }),
     }),
     // LoggerModule,

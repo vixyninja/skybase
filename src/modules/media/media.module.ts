@@ -1,6 +1,6 @@
 import {Module} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {CloudinaryModule} from '@/lib';
+import {CloudinaryModule} from '@/libs';
 import {MediaEntity} from './entities';
 import {MediaController} from './media.controller';
 import {MediaService} from './media.service';
