@@ -1,6 +1,7 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {UserEntity} from '../../entities';
 import {UserRepository} from './user.repository';
+import {MessageConstant} from '@/constants';
 
 @Injectable()
 export class UserAuthService {
@@ -15,6 +16,10 @@ export class UserAuthService {
   async findUserWithPassword(username: string): Promise<UserEntity> {
     try {
       const user: UserEntity = await this.repository.findUserWithPassword({username: username});
+
+      if (!user) {
+        throw new NotFoundException(MessageConstant.USER_NOT_FOUND);
+      }
 
       return user;
     } catch (e) {
@@ -32,6 +37,10 @@ export class UserAuthService {
     try {
       const user: UserEntity = await this.repository.findUserByEmail({email: email});
 
+      if (!user) {
+        throw new NotFoundException(MessageConstant.USER_NOT_FOUND);
+      }
+
       return user;
     } catch (e) {
       throw e;
@@ -47,6 +56,10 @@ export class UserAuthService {
   async findUserByUuid(uuid: string): Promise<UserEntity> {
     try {
       const user: UserEntity = await this.repository.findUserByUuid({uuid: uuid});
+
+      if (!user) {
+        throw new NotFoundException(MessageConstant.USER_NOT_FOUND);
+      }
 
       return user;
     } catch (e) {
@@ -64,6 +77,10 @@ export class UserAuthService {
   async findUserByPhone(phoneNumber: string): Promise<UserEntity> {
     try {
       const user: UserEntity = await this.repository.findUserByPhone({phoneNumber: phoneNumber});
+
+      if (!user) {
+        throw new NotFoundException(MessageConstant.USER_NOT_FOUND);
+      }
 
       return user;
     } catch (e) {

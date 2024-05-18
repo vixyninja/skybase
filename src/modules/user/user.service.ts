@@ -4,6 +4,7 @@ import {ProviderEnum} from '@/enums';
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {CreateUserDTO, UpdateUserDTO} from './dto';
 import {UserRepository} from './user.repository';
+import {MessageConstant} from '@/constants';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -17,10 +18,8 @@ export class UserService extends BaseService<UserEntity> {
    * @description This is method for create user
    * @returns {Promise<UserEntity>}
    */
-  async createUser(dto: CreateUserDTO): Promise<UserEntity> {
+  async createUser({email, firstName, lastName, password, provider}: CreateUserDTO): Promise<UserEntity> {
     try {
-      const {email, firstName, lastName, password, provider} = dto;
-
       let _provider: ProviderEnum = ProviderEnum.UNKNOWN;
 
       switch (provider) {
@@ -43,7 +42,9 @@ export class UserService extends BaseService<UserEntity> {
         provider: _provider,
       });
 
-      if (!user) throw new BadRequestException('User not created');
+      if (!user) {
+        throw new BadRequestException(MessageConstant.USER_NOT_CREATED);
+      }
 
       return user;
     } catch (e) {
@@ -61,7 +62,9 @@ export class UserService extends BaseService<UserEntity> {
     try {
       const user = await this.userRepository.findUserByUuid({uuid: uuid});
 
-      if (!user) throw new BadRequestException('User not found');
+      if (!user) {
+        throw new BadRequestException(MessageConstant.USER_NOT_FOUND);
+      }
 
       return user;
     } catch (e) {
@@ -80,11 +83,15 @@ export class UserService extends BaseService<UserEntity> {
     try {
       const user = await this.userRepository.findUserByUuid({uuid: uuid});
 
-      if (!user) throw new BadRequestException('User not found');
+      if (!user) {
+        throw new BadRequestException(MessageConstant.USER_NOT_FOUND);
+      }
 
       const updatedUser = await this.userRepository.updateUser(uuid, dto);
 
-      if (!updatedUser) throw new BadRequestException('User not updated');
+      if (!updatedUser) {
+        throw new BadRequestException(MessageConstant.USER_NOT_UPDATED);
+      }
 
       return updatedUser;
     } catch (e) {
@@ -102,11 +109,15 @@ export class UserService extends BaseService<UserEntity> {
     try {
       const user = await this.userRepository.findUserByUuid({uuid: uuid});
 
-      if (!user) throw new BadRequestException('User not found');
+      if (!user) {
+        throw new BadRequestException(MessageConstant.USER_NOT_FOUND);
+      }
 
       const deleted = await this.userRepository.deleteUser({uuid: uuid});
 
-      if (!deleted) throw new BadRequestException('User not deleted');
+      if (!deleted) {
+        throw new BadRequestException(MessageConstant.USER_NOT_UPDATED);
+      }
 
       return true;
     } catch (e) {

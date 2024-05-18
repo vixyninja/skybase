@@ -62,8 +62,9 @@ export class AuthService {
           },
           {
             algorithm: 'RS512',
-            privateKey: JWT_CONSTANT.ACCESS_TOKEN_KEY_PAIR.access_token_private_key_content,
-            expiresIn: '1h',
+            encoding: 'base64url',
+            privateKey: this.configService.jwtSecret().privateKey,
+            expiresIn: this.configService.tokenExpiresIn().accessTokenExpiresIn,
           },
         ),
         this.jwtService.signAsync(
@@ -73,11 +74,16 @@ export class AuthService {
           },
           {
             algorithm: 'RS256',
-            privateKey: JWT_CONSTANT.REFRESH_TOKEN_KEY_PAIR.refresh_token_private_key_content,
-            expiresIn: '3h',
+            encoding: 'base64url',
+            privateKey: this.configService.jwtSecret().privateKey,
+            expiresIn: this.configService.tokenExpiresIn().refreshTokenExpiresIn,
           },
         ),
       ]);
+
+      if (!accessToken || !refreshToken) {
+        throw new UnauthorizedException(MessageConstant.TOKEN_FAILED);
+      }
 
       return {accessToken, refreshToken};
     } catch (e) {
@@ -126,6 +132,10 @@ export class AuthService {
           },
         ),
       ]);
+
+      if (!accessToken || !refreshToken) {
+        throw new UnauthorizedException(MessageConstant.TOKEN_FAILED);
+      }
 
       return {accessToken, refreshToken};
     } catch (e) {
