@@ -61,7 +61,6 @@ import {ConfigsService} from './configs.service';
         REFRESH_TOKEN_EXPIRES_IN: joi.string().required(),
         PRIVATE_KEY: joi.string().required(),
         PUBLIC_KEY: joi.string().required(),
-        ALGORITHM: joi.string().required(),
         SESSION_SECRET_KEY: joi.string().required(),
         COOKIE_SECRET_KEY: joi.string().required(),
 

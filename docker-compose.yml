@@ -1,3 +1,5 @@
+name: byte-blog
+
 volumes:
   api:
     name: volume_api
@@ -8,9 +10,9 @@ volumes:
   redis:
     name: volume_redis
     driver: local
-  mongo-data:
-    name: volume_mongo
-    driver: local
+  # mongo-data:
+  #   name: volume_mongo
+  #   driver: local
 
 networks:
   default:
@@ -79,16 +81,16 @@ services:
     networks:
       - default
 
-  mongo:
-    container_name: mongo
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER_NAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_USER_PASS}
-      MONGO_INITDB_DATABASE: ${MONGO_NAME}
-    ports:
-      - ${MONGO_PORT}:${MONGO_PORT}
-    volumes:
-      - mongo-data:/data/db
-    networks:
-      - default
+  # mongo:
+  #   container_name: mongo
+  #   image: mongo:latest
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER_NAME}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_USER_PASS}
+  #     MONGO_INITDB_DATABASE: ${MONGO_NAME}
+  #   ports:
+  #     - ${MONGO_PORT}:${MONGO_PORT}
+  #   volumes:
+  #     - mongo-data:/data/db
+  #   networks:
+  #     - default

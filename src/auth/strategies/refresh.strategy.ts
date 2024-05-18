@@ -1,22 +1,24 @@
-import {JWT_CONSTANT} from '@/constants';
+import {ConfigsService} from '@/configs';
+import {RefreshTokenType} from '@/interfaces';
 import {Injectable} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {ExtractJwt, Strategy} from 'passport-jwt';
 import {AuthService} from '../auth.service';
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
-  constructor(private readonly authService: AuthService) {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigsService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
-      ignoreExpiration: false,
-      secretOrKey: JWT_CONSTANT.REFRESH_TOKEN_KEY_PAIR.refresh_token_public_key_content,
-      passReqToCallback: true,
+      secretOrKey: configService.jwtSecret().publicKey,
     });
   }
 
-  async validate(_: any, token: string) {
+  async validate(payload: RefreshTokenType) {
     try {
-      return await this.authService.refreshToken(token);
+      return await this.authService.refreshToken({...payload});
     } catch (e) {
       throw e;
     }

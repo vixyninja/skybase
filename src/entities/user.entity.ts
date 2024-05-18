@@ -8,7 +8,7 @@ import {Column, Entity, Index} from 'typeorm';
   orderBy: {
     createdAt: 'DESC',
   },
-  // comment: 'Table for user entity',
+  comment: 'Table for user entity',
 })
 export class UserEntity extends BaseEntity {
   @Column({
@@ -31,7 +31,7 @@ export class UserEntity extends BaseEntity {
   })
   lastName: string;
 
-  @Index('IDX_USER_EMAIL', {unique: true, where: 'deleted_at IS NULL'})
+  @Index('idx_user_email', {unique: true, where: 'deleted_at IS NULL'})
   @Column({
     type: 'varchar',
     length: 225,
@@ -41,7 +41,7 @@ export class UserEntity extends BaseEntity {
   })
   email: string;
 
-  @Index('IDX_USER_PHONE', {unique: true, where: 'deleted_at IS NULL'})
+  @Index('idx_user_phone', {unique: true, where: 'deleted_at IS NULL'})
   @Column({
     type: 'varchar',
     length: 20,

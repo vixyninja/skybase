@@ -1,5 +1,5 @@
-import {ExceptionsConstraint, JWT_CONSTANT} from '@/constants';
-import {CredentialNotCorrectException} from '@/exceptions';
+import {JWT_CONSTANT} from '@/constants';
+import {AccessTokenType} from '@/interfaces';
 import {Injectable} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {ExtractJwt, Strategy} from 'passport-jwt';
@@ -13,11 +13,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: any): Promise<any> {
+  async validate(payload: AccessTokenType): Promise<any> {
     try {
-      const user = await this.authService.validation(payload);
-
-      if (!user) throw new CredentialNotCorrectException(ExceptionsConstraint.UNAUTHORIZED);
+      const user = await this.authService.validation({...payload});
 
       return user;
     } catch (e) {

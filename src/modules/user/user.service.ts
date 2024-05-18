@@ -1,18 +1,15 @@
+import {BaseService} from '@/base';
+import {UserEntity} from '@/entities';
 import {ProviderEnum} from '@/enums';
 import {BadRequestException, Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
 import {CreateUserDTO, UpdateUserDTO} from './dto';
 import {UserRepository} from './user.repository';
-import {UserEntity} from '@/entities';
 
 @Injectable()
-export class UserService {
-  constructor(
-    private readonly userRepository: UserRepository,
-    @InjectRepository(UserEntity)
-    private readonly repository: Repository<UserEntity>,
-  ) {}
+export class UserService extends BaseService<UserEntity> {
+  constructor(private readonly userRepository: UserRepository) {
+    super(userRepository);
+  }
 
   /**
    *
