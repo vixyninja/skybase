@@ -1,3 +1,4 @@
+export * from './auth.enum';
 export * from './diary.enum';
 export * from './permission.enum';
 export * from './provider.enum';

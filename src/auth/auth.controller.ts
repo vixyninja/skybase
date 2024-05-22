@@ -1,7 +1,7 @@
 import {MessageConstant, RouteConstants, StatusConstants} from '@/constants';
 import {PublicRoute} from '@/decorators';
 import {Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards} from '@nestjs/common';
-import {ApiBody, ApiProperty, ApiTags} from '@nestjs/swagger';
+import {ApiBody, ApiOperation, ApiProperty, ApiTags} from '@nestjs/swagger';
 import {Request, Response} from 'express';
 import {AuthService} from './auth.service';
 import {LoginDTO, RegisterDTO} from './dto';
@@ -22,6 +22,7 @@ export class AuthController {
   @ApiBody({
     type: LoginDTO,
   })
+  @ApiOperation({summary: 'Login with email and password'})
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalGuard)
@@ -53,6 +54,7 @@ export class AuthController {
   @ApiBody({
     type: RegisterDTO,
   })
+  @ApiOperation({summary: 'Register with email and password'})
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Res() res: Response, @Body() body: RegisterDTO) {
@@ -82,6 +84,7 @@ export class AuthController {
   @ApiBody({
     type: 'string',
   })
+  @ApiOperation({summary: 'Refresh token'})
   @Post('refresh')
   @UseGuards(RefreshGuard)
   @HttpCode(HttpStatus.OK)

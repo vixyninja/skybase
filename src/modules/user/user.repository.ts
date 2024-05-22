@@ -1,15 +1,15 @@
 import {BaseAbstractRepository} from '@/base';
+import {UserEntity} from '@/entities';
 import {ProviderEnum} from '@/enums';
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
-import {UserEntity} from '../../entities';
 
 @Injectable()
 export class UserRepository extends BaseAbstractRepository<UserEntity> {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly repository: Repository<UserEntity>,
+    readonly repository: Repository<UserEntity>,
   ) {
     super(repository);
   }
@@ -19,14 +19,34 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
    * @description This is method for find user and return password
    * @return {Promise<UserEntity>}
    */
-  public findUserWithPassword({username}: {username: string}): Promise<UserEntity> {
+  public findUserEmailWithPassword({email}: {email: string}): Promise<UserEntity> {
     return Promise.resolve(
       this._repository
         .createQueryBuilder('tbl_user')
         .addSelect('tbl_user.password')
-        .where('tbl_user.email = :email', {email: username})
-        .orWhere('tbl_user.phone_number = :phoneNumber', {phoneNumber: username})
-        .getOne(),
+        .where('tbl_user.email = :email', {email: email})
+        .getOne()
+        .catch((e) => {
+          throw e;
+        }),
+    );
+  }
+
+  /**
+   * @param {string} phoneNumber
+   * @description This is method for find user and return password
+   * @return {Promise<UserEntity>}
+   */
+  public findUserPhoneWithPassword({phoneNumber}: {phoneNumber: string}): Promise<UserEntity> {
+    return Promise.resolve(
+      this._repository
+        .createQueryBuilder('tbl_user')
+        .addSelect('tbl_user.password')
+        .where('tbl_user.phone_number = :phoneNumber', {phoneNumber: phoneNumber})
+        .getOne()
+        .catch((e) => {
+          throw e;
+        }),
     );
   }
 
@@ -37,7 +57,13 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
    */
   public findUserByEmail({email}: {email: string}): Promise<UserEntity> {
     return Promise.resolve(
-      this._repository.createQueryBuilder('tbl_user').where('tbl_user.email = :email', {email: email}).getOne(),
+      this._repository
+        .createQueryBuilder('tbl_user')
+        .where('tbl_user.email = :email', {email: email})
+        .getOne()
+        .catch((e) => {
+          throw e;
+        }),
     );
   }
 
@@ -48,7 +74,13 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
    */
   public findUserByUuid({uuid}: {uuid: string}): Promise<UserEntity> {
     return Promise.resolve(
-      this._repository.createQueryBuilder('tbl_user').where('tbl_user.uuid = :uuid', {uuid: uuid}).getOne(),
+      this._repository
+        .createQueryBuilder('tbl_user')
+        .where('tbl_user.uuid = :uuid', {uuid: uuid})
+        .getOne()
+        .catch((e) => {
+          throw e;
+        }),
     );
   }
 
@@ -62,7 +94,10 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
       this._repository
         .createQueryBuilder('tbl_user')
         .where('tbl_user.phone_number = :phoneNumber', {phoneNumber: phoneNumber})
-        .getOne(),
+        .getOne()
+        .catch((e) => {
+          throw e;
+        }),
     );
   }
 
@@ -95,7 +130,7 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
     password: string;
     provider: ProviderEnum;
   }): Promise<UserEntity> {
-    const promise = Promise.resolve(
+    return Promise.resolve(
       this._repository
         .createQueryBuilder('tbl_user')
         .insert()
@@ -107,10 +142,12 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
           password: password,
           provider: provider,
         })
-        .execute(),
+        .execute()
+        .then((result) => this.findUserByUuid({uuid: result.identifiers[0].uuid}))
+        .catch((e) => {
+          throw e;
+        }),
     );
-
-    return promise.then((result) => this.findUserByUuid({uuid: result.identifiers[0].uuid}));
   }
 
   /**
@@ -128,7 +165,7 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
       phoneNumber,
     }: Partial<{firstName: string; lastName: string; phoneNumber: string; deviceToken: string}>,
   ): Promise<UserEntity> {
-    const promise = Promise.resolve(
+    return Promise.resolve(
       this._repository
         .createQueryBuilder('tbl_user')
         .update()
@@ -140,10 +177,11 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
         })
         .where('uuid = :uuid', {uuid: uuid})
         .execute()
-        .then(() => this.findUserByUuid({uuid: uuid})),
+        .then(() => this.findUserByUuid({uuid: uuid}))
+        .catch((e) => {
+          throw e;
+        }),
     );
-
-    return promise.then(() => this.findUserByUuid({uuid: uuid}));
   }
 
   /**
@@ -151,16 +189,18 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
    * @description This is method for delete user
    * @return {Promise<UserEntity>}
    */
-  public deleteUser({uuid}: {uuid: string}): Promise<UserEntity> {
-    const promise = Promise.resolve(
+  public deleteUser({uuid}: {uuid: string}): Promise<boolean> {
+    return Promise.resolve(
       this._repository
         .createQueryBuilder('tbl_user')
         .softDelete()
         .from(UserEntity)
         .where('uuid = :uuid', {uuid})
-        .execute(),
+        .execute()
+        .then((result) => result.affected > 0)
+        .catch((e) => {
+          throw e;
+        }),
     );
-
-    return promise.then(() => this.findUserByUuid({uuid: uuid}));
   }
 }

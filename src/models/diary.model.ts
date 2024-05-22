@@ -1,4 +1,4 @@
-import {DiaryType} from '@/enums';
+import {DiaryEnum} from '@/enums';
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
 import {HydratedDocument} from 'mongoose';
 
@@ -12,7 +12,7 @@ export class Diary {
   @Prop({
     required: true,
   })
-  type: DiaryType;
+  type: DiaryEnum;
 
   @Prop({
     isRequired: false,

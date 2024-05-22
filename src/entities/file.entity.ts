@@ -2,12 +2,13 @@ import {BaseEntity} from 'src/base';
 import {Column, Entity} from 'typeorm';
 
 @Entity({
-  name: 'media',
+  name: 'file',
   orderBy: {
     createdAt: 'DESC',
   },
+  comment: 'Table for file entity',
 })
-export class MediaEntity extends BaseEntity {
+export class FileEntity extends BaseEntity {
   @Column({
     name: 'public_id',
     type: 'varchar',
@@ -173,7 +174,7 @@ export class MediaEntity extends BaseEntity {
   })
   folder: string;
 
-  constructor(partial: Partial<MediaEntity>) {
+  constructor(partial: Partial<FileEntity>) {
     super();
     Object.assign(this, partial);
   }

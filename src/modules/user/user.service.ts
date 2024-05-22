@@ -1,15 +1,63 @@
 import {BaseService} from '@/base';
+import {MessageConstant} from '@/constants';
 import {UserEntity} from '@/entities';
-import {ProviderEnum} from '@/enums';
+import {AuthFindByEnum, ProviderValue} from '@/enums';
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {CreateUserDTO, UpdateUserDTO} from './dto';
 import {UserRepository} from './user.repository';
-import {MessageConstant} from '@/constants';
+import {isUUID} from 'class-validator';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
   constructor(private readonly userRepository: UserRepository) {
     super(userRepository);
+  }
+
+  /**
+   *
+   * @param {string} val
+   * @param {AuthFindByEnum} type
+   * @param {boolean} withPassword
+   * @description This is method for find user by type
+   * @returns {Promise<UserEntity>}
+   */
+  async findUserByType(val: string, type: AuthFindByEnum, withPassword?: boolean): Promise<UserEntity> {
+    try {
+      let user: UserEntity;
+
+      if (withPassword) {
+        switch (type) {
+          case AuthFindByEnum.EMAIL:
+            user = await this.userRepository.findUserEmailWithPassword({email: val});
+            break;
+          case AuthFindByEnum.PHONE:
+            user = await this.userRepository.findUserPhoneWithPassword({phoneNumber: val});
+            break;
+          default:
+            break;
+        }
+      } else {
+        switch (type) {
+          case AuthFindByEnum.EMAIL:
+            user = await this.userRepository.findUserByEmail({email: val});
+            break;
+          case AuthFindByEnum.PHONE:
+            user = await this.userRepository.findUserByPhone({phoneNumber: val});
+            break;
+          case AuthFindByEnum.UUID:
+            user = await this.userRepository.findUserByUuid({uuid: val});
+            break;
+          default:
+            break;
+        }
+      }
+      if (!user) {
+        throw new BadRequestException(MessageConstant.USER_NOT_FOUND);
+      }
+      return user;
+    } catch (e) {
+      throw e;
+    }
   }
 
   /**
@@ -20,19 +68,7 @@ export class UserService extends BaseService<UserEntity> {
    */
   async createUser({email, firstName, lastName, password, provider}: CreateUserDTO): Promise<UserEntity> {
     try {
-      let _provider: ProviderEnum = ProviderEnum.UNKNOWN;
-
-      switch (provider) {
-        case ProviderEnum.GOOGLE:
-          _provider = ProviderEnum.GOOGLE;
-          break;
-        case ProviderEnum.EMAIL:
-          _provider = ProviderEnum.EMAIL;
-          break;
-        default:
-          _provider = ProviderEnum.UNKNOWN;
-          break;
-      }
+      let _provider = ProviderValue(provider);
 
       const user = await this.userRepository.storeUser({
         email: email,

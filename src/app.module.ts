@@ -19,6 +19,7 @@ import {ValidationPipe} from './pipes';
     ConfigsModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'public'),
+      renderPath: '/',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigsModule],
@@ -57,7 +58,8 @@ import {ValidationPipe} from './pipes';
       }),
     }),
     // LoggerModule,
-    // BUSINESS MODULES
+
+    // ! BUSINESS MODULES
     AuthModule,
     UserModule,
   ],

@@ -1,8 +1,8 @@
 import {ConfigsService} from '@/configs';
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {UploadApiOptions, v2 as cloudinary} from 'cloudinary';
-import {CloudinaryResponse} from './cloudinary.provider';
 import {ICloudinary} from './cloudinary.interface';
+import {CloudinaryResponse} from './cloudinary.provider';
 
 const streamifier = require('streamifier');
 

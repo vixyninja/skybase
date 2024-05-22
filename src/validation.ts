@@ -1,6 +1,9 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsNotEmpty, IsUUID} from 'class-validator';
+import {IsNotEmpty, IsUUID, isUUID} from 'class-validator';
 
+/**
+ * @description This is DTO for UUID param
+ */
 export class UUIDParamDTO {
   @IsNotEmpty()
   @IsUUID('4')
@@ -10,4 +13,14 @@ export class UUIDParamDTO {
     format: 'uuid',
   })
   uuid: string;
+}
+
+/**
+ * @param {string} val
+ * @param {UUIDVersion} version
+ * @description This is function for check UUID
+ * @returns {boolean}
+ */
+export function isUUIDv4(val: string, version?: validator.UUIDVersion): boolean {
+  return isUUID(val, 4);
 }

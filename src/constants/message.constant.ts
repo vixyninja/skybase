@@ -1,3 +1,5 @@
+import {FILE} from 'dns';
+
 export const MessageConstant = {
   // ! COMMON
   INTERNAL_SERVER_ERROR: 'Oops! Something went wrong',
@@ -5,6 +7,7 @@ export const MessageConstant = {
   UNAUTHORIZED: 'Unauthorized',
   FORBIDDEN: 'Forbidden',
   BAD_REQUEST: 'Bad Request',
+  INVALID_UUID: 'Invalid UUID',
 
   // ! AUTH
   TOKEN_EXPIRED: 'Token is expired',
@@ -16,6 +19,12 @@ export const MessageConstant = {
   // ! FILE
   FILE_SIZE_TOO_LARGE: 'File size is too large (max 10MB)',
   FILE_TYPE_NOT_SUPPORTED: 'File type is not supported',
+  FILE_UPLOAD_SUCCESS: 'File uploaded successfully',
+  FILE_UPLOAD_FAILED: 'File uploaded failed',
+  FILE_DELETE_SUCCESS: 'File deleted successfully',
+  FILE_DELETE_FAILED: 'File deleted failed',
+  FILE_GET_SUCCESS: 'Get file successfully',
+  FILE_GET_FAILED: 'Get file failed',
 
   // ! REGISTER
   REGISTER_SUCCESS: 'Register successfully',
