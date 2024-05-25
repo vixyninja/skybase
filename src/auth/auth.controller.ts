@@ -26,7 +26,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalGuard)
-  async login(@Res() res: Response, @Req() req: Request) {
+  async login(@Res() res: Response, @Req() req: Request): Promise<any> {
     try {
       const user = req.user;
 
@@ -57,7 +57,7 @@ export class AuthController {
   @ApiOperation({summary: 'Register with email and password'})
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Res() res: Response, @Body() body: RegisterDTO) {
+  async register(@Res() res: Response, @Body() body: RegisterDTO): Promise<any> {
     try {
       const user = await this.authService.register(body);
 
@@ -88,7 +88,7 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(RefreshGuard)
   @HttpCode(HttpStatus.OK)
-  async refresh(@Res() res: Response, @Req() req: Request) {
+  async refresh(@Res() res: Response, @Req() req: Request): Promise<any> {
     const user = req.user;
     return res
       .status(HttpStatus.OK)

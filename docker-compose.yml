@@ -7,9 +7,9 @@ volumes:
   postgres:
     name: volume_postgres
     driver: local
-  redis:
-    name: volume_redis
-    driver: local
+  # redis:
+  #   name: volume_redis
+  #   driver: local
   # mongo-data:
   #   name: volume_mongo
   #   driver: local
@@ -49,37 +49,37 @@ services:
       - ${PORT}:${PORT}
     depends_on:
       - postgres
-      - redis
+      # - redis
     env_file:
       - .env
     volumes:
       - ./:/usr/src/app
 
-  redis:
-    container_name: redis
-    image: redis:alpine3.19
-    ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
-    environment:
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-    networks:
-      - default
-    volumes:
-      - redis:/var/lib/redis/data
+  # redis:
+  #   container_name: redis
+  #   image: redis:alpine3.19
+  #   ports:
+  #     - ${REDIS_PORT}:${REDIS_PORT}
+  #   environment:
+  #     REDIS_HOST: ${REDIS_HOST}
+  #     REDIS_PORT: ${REDIS_PORT}
+  #   networks:
+  #     - default
+  #   volumes:
+  #     - redis:/var/lib/redis/data
 
-  adminer:
-    container_name: adminer
-    image: adminer:latest
-    ports:
-      - ${ADMIN_PORT}:${ADMIN_PORT}
-    depends_on:
-      - postgres
-    environment:
-      ADMINER_PLUGINS: tables-filter tinymce
-      ADMINER_DESIGN: dracula
-    networks:
-      - default
+  # adminer:
+  #   container_name: adminer
+  #   image: adminer:latest
+  #   ports:
+  #     - ${ADMIN_PORT}:${ADMIN_PORT}
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     ADMINER_PLUGINS: tables-filter tinymce
+  #     ADMINER_DESIGN: dracula
+  #   networks:
+  #     - default
 
   # mongo:
   #   container_name: mongo

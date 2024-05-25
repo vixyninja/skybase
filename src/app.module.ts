@@ -26,37 +26,37 @@ import {ValidationPipe} from './pipes';
       inject: [ConfigsService],
       useFactory: async (configsService: ConfigsService) => configsService.postgresConnection(),
     }),
-    BaseCacheModule.registerAsync<CacheModuleAsyncOptions>({
-      imports: [ConfigsModule],
-      inject: [ConfigsService],
-      isGlobal: true,
-      useFactory: async (configs: ConfigsService) => {
-        const store = await redisStore.redisStore({
-          socket: {
-            host: configs.redisHost(),
-            port: configs.redisPort(),
-          },
-        });
+    // BaseCacheModule.registerAsync<CacheModuleAsyncOptions>({
+    //   imports: [ConfigsModule],
+    //   inject: [ConfigsService],
+    //   isGlobal: true,
+    //   useFactory: async (configs: ConfigsService) => {
+    //     const store = await redisStore.redisStore({
+    //       socket: {
+    //         host: configs.redisHost(),
+    //         port: configs.redisPort(),
+    //       },
+    //     });
 
-        return {
-          store: {
-            create: () => store as unknown as CacheStore,
-          },
-        };
-      },
-    }),
-    ThrottlerModule.forRootAsync({
-      imports: [ConfigsModule],
-      inject: [ConfigsService],
-      useFactory: (configService: ConfigsService) => ({
-        throttlers: [
-          {
-            ttl: configService.throttleTTL(),
-            limit: configService.throttleLimit(),
-          },
-        ],
-      }),
-    }),
+    //     return {
+    //       store: {
+    //         create: () => store as unknown as CacheStore,
+    //       },
+    //     };
+    //   },
+    // }),
+    // ThrottlerModule.forRootAsync({
+    //   imports: [ConfigsModule],
+    //   inject: [ConfigsService],
+    //   useFactory: (configService: ConfigsService) => ({
+    //     throttlers: [
+    //       {
+    //         ttl: configService.throttleTTL(),
+    //         limit: configService.throttleLimit(),
+    //       },
+    //     ],
+    //   }),
+    // }),
     // LoggerModule,
 
     // ! BUSINESS MODULES
@@ -76,10 +76,10 @@ import {ValidationPipe} from './pipes';
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
     {
       provide: APP_GUARD,
       useClass: JwtGuard,

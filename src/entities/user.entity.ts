@@ -1,7 +1,8 @@
 import {BaseEntity} from '@/base';
 import {ProviderEnum, UserStatusEnum} from '@/enums';
 import {compareHash} from '@/utils';
-import {Column, Entity, Index} from 'typeorm';
+import {Column, Entity, Index, JoinColumn, OneToOne} from 'typeorm';
+import {FileEntity} from './file.entity';
 
 @Entity({
   name: 'user',
@@ -90,35 +91,35 @@ export class UserEntity extends BaseEntity {
   password: string;
 
   // ! ############################# RELATION #############################
-  // @JoinColumn({
-  //   foreignKeyConstraintName: 'FK_USER_AVATAR',
-  //   name: 'avatar',
-  //   referencedColumnName: 'uuid',
-  // })
-  // @OneToOne(() => MediaEntity, (media) => media.uuid, {
-  //   cascade: true,
-  //   nullable: true,
-  //   eager: true,
-  //   lazy: false,
-  //   onDelete: 'SET NULL',
-  //   onUpdate: 'CASCADE',
-  // })
-  // avatar: MediaEntity;
+  @JoinColumn({
+    foreignKeyConstraintName: 'fk_user_avatar',
+    name: 'avatar',
+    referencedColumnName: 'uuid',
+  })
+  @OneToOne(() => FileEntity, (media) => media.uuid, {
+    cascade: true,
+    nullable: true,
+    eager: true,
+    lazy: false,
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
+  avatar: FileEntity;
 
-  // @JoinColumn({
-  //   foreignKeyConstraintName: 'FK_USER_BACKGROUND',
-  //   name: 'background',
-  //   referencedColumnName: 'uuid',
-  // })
-  // @OneToOne(() => MediaEntity, (media) => media.uuid, {
-  //   cascade: true,
-  //   nullable: true,
-  //   eager: true,
-  //   lazy: false,
-  //   onDelete: 'SET NULL',
-  //   onUpdate: 'CASCADE',
-  // })
-  // background: MediaEntity;
+  @JoinColumn({
+    foreignKeyConstraintName: 'fk_user_background',
+    name: 'background',
+    referencedColumnName: 'uuid',
+  })
+  @OneToOne(() => FileEntity, (media) => media.uuid, {
+    cascade: true,
+    nullable: true,
+    eager: true,
+    lazy: false,
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
+  background: FileEntity;
 
   // * ############################# METHOD #############################
   comparePassword(attempt: string): boolean {

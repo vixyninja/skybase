@@ -3,7 +3,7 @@ import {ICloudinary} from '@/libs';
 import {BadRequestException, Inject, Injectable} from '@nestjs/common';
 import {validate} from 'class-validator';
 import {CLOUDINARY_SERVICE, MessageConstant} from 'src/constants';
-import {CreateFileDTO} from './dtos';
+import {CreateFileDTO} from './dto';
 import {FileRepository} from './file.repository';
 
 @Injectable()
@@ -38,7 +38,9 @@ export class FileService {
   async createMedia(file: Express.Multer.File): Promise<FileEntity> {
     try {
       const upload = await this.cloudinaryService.upload(file);
+
       if (!upload) throw new BadRequestException(MessageConstant.FILE_UPLOAD_FAILED);
+
       const arg: CreateFileDTO = {
         publicId: upload.public_id,
         url: upload.secure_url,
@@ -59,7 +61,9 @@ export class FileService {
         version: upload.version,
         versionId: upload.version_id,
       };
+
       const validator = await validate(arg);
+
       if (validator.length > 0) throw new BadRequestException(MessageConstant.FILE_UPLOAD_FAILED);
 
       const media = await this.fileRepository.storeMedia(arg);

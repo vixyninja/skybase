@@ -1,5 +1,3 @@
-import {FILE} from 'dns';
-
 export const MessageConstant = {
   // ! COMMON
   INTERNAL_SERVER_ERROR: 'Oops! Something went wrong',
@@ -46,4 +44,5 @@ export const MessageConstant = {
   USER_NOT_CREATED: 'User not created',
   USER_NOT_UPDATED: 'User not updated',
   GET_USER_SUCCESS: 'Get user successfully',
+  USER_EXIST: 'User already exists',
 };

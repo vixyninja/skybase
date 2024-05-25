@@ -5,7 +5,6 @@ import {AuthFindByEnum, ProviderValue} from '@/enums';
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {CreateUserDTO, UpdateUserDTO} from './dto';
 import {UserRepository} from './user.repository';
-import {isUUID} from 'class-validator';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
@@ -68,7 +67,13 @@ export class UserService extends BaseService<UserEntity> {
    */
   async createUser({email, firstName, lastName, password, provider}: CreateUserDTO): Promise<UserEntity> {
     try {
-      let _provider = ProviderValue(provider);
+      const _provider = ProviderValue(provider);
+
+      const existUser = await this.userRepository.findUserByEmail({email: email});
+
+      if (existUser) {
+        throw new BadRequestException(MessageConstant.USER_EXIST);
+      }
 
       const user = await this.userRepository.storeUser({
         email: email,

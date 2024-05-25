@@ -16,7 +16,7 @@ export class LoggersMiddleware implements NestMiddleware {
       } else if (statusCode >= HttpStatus.BAD_REQUEST) {
         this.logger.warn(`${method} ${originalUrl} ${statusCode} ${statusMessage} - ${userAgent} ${ip}`);
       } else {
-        this.logger.log(`${method} ${originalUrl} ${statusCode} ${statusMessage} - ${userAgent} ${ip}`);
+        this.logger.verbose(`${method} ${originalUrl} ${statusCode} ${statusMessage} - ${userAgent} ${ip}`);
       }
     });
     next();

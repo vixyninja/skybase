@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { JwtPayload } from 'jsonwebtoken';
-import { SecureConstant } from 'secure';
+import {JwtPayload} from 'jsonwebtoken';
+import {SecureConstant} from 'secure';
 
 @Injectable()
 export class TokenService {

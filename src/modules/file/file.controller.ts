@@ -1,9 +1,9 @@
 import {JwtGuard} from '@/auth';
+import {MessageConstant, RouteConstants, StatusConstants} from '@/constants';
 import {isUUIDv4} from '@/validation';
 import {BadRequestException, Controller, Get, HttpCode, HttpStatus, Param, Res, UseGuards} from '@nestjs/common';
 import {ApiOperation, ApiProperty, ApiTags} from '@nestjs/swagger';
 import {Response} from 'express';
-import {MessageConstant, RouteConstants, StatusConstants} from 'src/constants';
 import {FileService} from './file.service';
 
 @ApiTags(RouteConstants.file)
