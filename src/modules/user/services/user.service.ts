@@ -1,14 +1,19 @@
 import {BaseService} from '@/base';
 import {MessageConstant} from '@/constants';
 import {UserEntity} from '@/entities';
-import {AuthFindByEnum, ProviderValue} from '@/enums';
+import {AuthFindByEnum} from '@/enums';
 import {BadRequestException, Injectable} from '@nestjs/common';
-import {CreateUserDTO, UpdateUserDTO} from './dto';
-import {UserRepository} from './user.repository';
+import {CreateUserDTO, UpdateUserDTO} from '../dto';
+import {UserRepository} from '../repositories';
+import {CredentialService} from './credential.service';
+import {CreateCredentialDTO} from '../dto/create-credential.dto';
 
 @Injectable()
 export class UserService extends BaseService<UserEntity> {
-  constructor(private readonly userRepository: UserRepository) {
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly credentialService: CredentialService,
+  ) {
     super(userRepository);
   }
 
@@ -16,43 +21,33 @@ export class UserService extends BaseService<UserEntity> {
    *
    * @param {string} val
    * @param {AuthFindByEnum} type
-   * @param {boolean} withPassword
    * @description This is method for find user by type
    * @returns {Promise<UserEntity>}
    */
-  async findUserByType(val: string, type: AuthFindByEnum, withPassword?: boolean): Promise<UserEntity> {
+  async findUserByType(val: string, type: AuthFindByEnum): Promise<UserEntity> {
     try {
       let user: UserEntity;
 
-      if (withPassword) {
-        switch (type) {
-          case AuthFindByEnum.EMAIL:
-            user = await this.userRepository.findUserEmailWithPassword({email: val});
-            break;
-          case AuthFindByEnum.PHONE:
-            user = await this.userRepository.findUserPhoneWithPassword({phoneNumber: val});
-            break;
-          default:
-            break;
-        }
-      } else {
-        switch (type) {
-          case AuthFindByEnum.EMAIL:
-            user = await this.userRepository.findUserByEmail({email: val});
-            break;
-          case AuthFindByEnum.PHONE:
-            user = await this.userRepository.findUserByPhone({phoneNumber: val});
-            break;
-          case AuthFindByEnum.UUID:
-            user = await this.userRepository.findUserByUuid({uuid: val});
-            break;
-          default:
-            break;
-        }
+      switch (type) {
+        case AuthFindByEnum.EMAIL:
+          user = await this.userRepository.findUserByEmail({email: val});
+          break;
+        case AuthFindByEnum.PHONE:
+          user = await this.userRepository.findUserByPhone({phoneNumber: val});
+          break;
+        case AuthFindByEnum.UUID:
+          user = await this.userRepository.findUserByUuid({uuid: val});
+          break;
+        case AuthFindByEnum.REL_CREDENTIAL:
+          user = await this.userRepository.findUserByCredentialUUID({uuid: val});
+          break;
+        default:
+          throw new BadRequestException(MessageConstant.INVALID_FIELD);
       }
       if (!user) {
         throw new BadRequestException(MessageConstant.USER_NOT_FOUND);
       }
+
       return user;
     } catch (e) {
       throw e;
@@ -65,27 +60,24 @@ export class UserService extends BaseService<UserEntity> {
    * @description This is method for create user
    * @returns {Promise<UserEntity>}
    */
-  async createUser({email, firstName, lastName, password, provider}: CreateUserDTO): Promise<UserEntity> {
+  async createUser({
+    firstName,
+    lastName,
+    loginName,
+    password,
+  }: CreateUserDTO & CreateCredentialDTO): Promise<UserEntity> {
     try {
-      const _provider = ProviderValue(provider);
+      const credential = await this.credentialService.createCredential({loginName, password});
 
-      const existUser = await this.userRepository.findUserByEmail({email: email});
-
-      if (existUser) {
-        throw new BadRequestException(MessageConstant.USER_EXIST);
+      if (!credential) {
+        throw new BadRequestException(MessageConstant.USER_NOT_CREATED);
       }
 
       const user = await this.userRepository.storeUser({
-        email: email,
         firstName: firstName,
         lastName: lastName,
-        password: password,
-        provider: _provider,
+        credential: credential,
       });
-
-      if (!user) {
-        throw new BadRequestException(MessageConstant.USER_NOT_CREATED);
-      }
 
       return user;
     } catch (e) {

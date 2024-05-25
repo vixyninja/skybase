@@ -1,10 +1,7 @@
-import {CacheModule as BaseCacheModule, CacheModuleAsyncOptions, CacheStore} from '@nestjs/cache-manager';
 import {MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
 import {APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE} from '@nestjs/core';
 import {ServeStaticModule} from '@nestjs/serve-static';
-import {ThrottlerGuard, ThrottlerModule} from '@nestjs/throttler';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import * as redisStore from 'cache-manager-redis-store';
 import {join} from 'path';
 import {AuthModule, JwtGuard} from './auth';
 import {ConfigsModule, ConfigsService} from './configs';
@@ -13,6 +10,7 @@ import {TimeoutInterceptor} from './interceptors';
 import {LoggersMiddleware} from './middlewares';
 import {UserModule} from './modules/user';
 import {ValidationPipe} from './pipes';
+import {TokenModule} from './token';
 
 @Module({
   imports: [
@@ -58,7 +56,7 @@ import {ValidationPipe} from './pipes';
     //   }),
     // }),
     // LoggerModule,
-
+    TokenModule,
     // ! BUSINESS MODULES
     AuthModule,
     UserModule,

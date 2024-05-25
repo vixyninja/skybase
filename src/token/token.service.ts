@@ -1,17 +1,49 @@
+import {ConfigsService} from '@/configs';
 import {Injectable} from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import {JwtPayload} from 'jsonwebtoken';
+import * as crypto from 'node:crypto';
 import {SecureConstant} from 'secure';
-
 @Injectable()
 export class TokenService {
+  constructor(private readonly configsService: ConfigsService) {}
+
+  /**
+   * Generate a salt
+   * @returns salt string
+   */
+  public generateSalt(): Promise<string> {
+    return bcrypt.genSalt();
+  }
+
+  /**
+   * Hash a payload
+   * @param payload string
+   * @param salt string
+   * @returns hash string
+   */
+  public hashPayload(payload: string, salt: string | number): Promise<string> {
+    return bcrypt.hash(payload, salt);
+  }
+
+  /**
+   * Compare a payload with a hash
+   * @param payload string
+   * @param hash string
+   * @returns boolean
+   */
+  public comparePayload(payload: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(payload, hash);
+  }
+
   /**
    * Sign a token
    * @param model object
    * @param options jwt.SignOptions
    * @returns token
    */
-  public signToken(model: object, options?: jwt.SignOptions) {
+  public signToken(model: object, options?: jwt.SignOptions): Promise<string> {
     return new Promise((resolve, reject) => {
       jwt.sign(model, SecureConstant.SECRET, options, (err: Error, token: string) => {
         if (err) {
@@ -92,5 +124,42 @@ export class TokenService {
         resolve(decoded);
       });
     });
+  }
+
+  /**
+   * Generate a key pair
+   * @returns Promise<{privateKey: string; publicKey: string}>
+   */
+  public generateKeyPair(): Promise<{privateKey: string; publicKey: string}> {
+    return new Promise((resolve, reject) => {
+      crypto.generateKeyPair(
+        'rsa',
+        {
+          modulusLength: 4096,
+          publicKeyEncoding: {type: 'spki', format: 'pem'},
+          privateKeyEncoding: {
+            type: 'pkcs8',
+            format: 'pem',
+            passphrase: this.configsService.passPhrase(),
+            cipher: 'aes-192-cbc',
+          },
+          publicExponent: 0x10001,
+        },
+        (err, publicKey, privateKey) => {
+          if (err) {
+            reject(err);
+          }
+          resolve({privateKey, publicKey});
+        },
+      );
+    });
+  }
+
+  /**
+   * Generate a secret key
+   * @returns string
+   */
+  public generateSecretKey(): string {
+    return crypto.randomBytes(32).toString('hex');
   }
 }

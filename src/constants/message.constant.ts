@@ -6,6 +6,7 @@ export const MessageConstant = {
   FORBIDDEN: 'Forbidden',
   BAD_REQUEST: 'Bad Request',
   INVALID_UUID: 'Invalid UUID',
+  INVALID_FIELD: 'Invalid field',
 
   // ! AUTH
   TOKEN_EXPIRED: 'Token is expired',

@@ -4,7 +4,7 @@ import {isUUIDv4} from '@/validation';
 import {BadRequestException, Controller, Get, HttpCode, HttpStatus, Res} from '@nestjs/common';
 import {ApiOperation, ApiProperty, ApiTags} from '@nestjs/swagger';
 import {Response} from 'express';
-import {UserService} from './user.service';
+import {UserService} from '../services';
 
 @ApiTags(RouteConstants.USER)
 @Controller(RouteConstants.USER)

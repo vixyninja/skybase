@@ -1,6 +1,5 @@
 import {BaseAbstractRepository} from '@/base';
-import {UserEntity} from '@/entities';
-import {ProviderEnum} from '@/enums';
+import {CredentialEntity, UserEntity} from '@/entities';
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
@@ -13,43 +12,6 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
   ) {
     super(repository);
   }
-
-  /**
-   * @param {string} username (email or phone number)
-   * @description This is method for find user and return password
-   * @return {Promise<UserEntity>}
-   */
-  public findUserEmailWithPassword({email}: {email: string}): Promise<UserEntity> {
-    return Promise.resolve(
-      this._repository
-        .createQueryBuilder('tbl_user')
-        .addSelect('tbl_user.password')
-        .where('tbl_user.email = :email', {email: email})
-        .getOne()
-        .catch((e) => {
-          throw e;
-        }),
-    );
-  }
-
-  /**
-   * @param {string} phoneNumber
-   * @description This is method for find user and return password
-   * @return {Promise<UserEntity>}
-   */
-  public findUserPhoneWithPassword({phoneNumber}: {phoneNumber: string}): Promise<UserEntity> {
-    return Promise.resolve(
-      this._repository
-        .createQueryBuilder('tbl_user')
-        .addSelect('tbl_user.password')
-        .where('tbl_user.phone_number = :phoneNumber', {phoneNumber: phoneNumber})
-        .getOne()
-        .catch((e) => {
-          throw e;
-        }),
-    );
-  }
-
   /**
    * @param {string} email
    * @description This is method for find user by email
@@ -106,29 +68,50 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
    * @description This is method for find user by uuid and load relations
    * @return {Promise<UserEntity>}
    */
-  public findUserWasDeleted({uuid}: {uuid: string}): Promise<UserEntity> {
+  public findUserByCredentialUUID({uuid}: {uuid: string}): Promise<UserEntity> {
     return Promise.resolve(
-      this._repository.createQueryBuilder('tbl_user').withDeleted().where('tbl_user.uuid = :uuid', {uuid}).getOne(),
+      this._repository
+        .createQueryBuilder('tbl_user')
+        .leftJoinAndSelect('tbl_user.credential', 'tbl_credential')
+        .where('tbl_credential.uuid = :uuid', {uuid})
+        .getOne()
+        .catch((e) => {
+          throw e;
+        }),
     );
   }
 
   /**
-   * @param {firstName: string; lastName: string; email: string; password: string; provider: ProviderEnum}
+   * @param {string} uuid
+   * @description This is method for find user by uuid and load relations
+   * @return {Promise<UserEntity>}
+   */
+  public findUserWasDeleted({uuid}: {uuid: string}): Promise<UserEntity> {
+    return Promise.resolve(
+      this._repository
+        .createQueryBuilder('tbl_user')
+        .withDeleted()
+        .where('tbl_user.uuid = :uuid', {uuid})
+        .getOne()
+        .catch((e) => {
+          throw e;
+        }),
+    );
+  }
+
+  /**
+   * @param {firstName: string; lastName: string, credential: CredentialEntity}
    * @description This is method for store user
    * @return {Promise<UserEntity>}
    */
   public storeUser({
     firstName,
     lastName,
-    email,
-    password,
-    provider,
+    credential,
   }: {
     firstName: string;
     lastName: string;
-    email: string;
-    password: string;
-    provider: ProviderEnum;
+    credential: CredentialEntity;
   }): Promise<UserEntity> {
     return Promise.resolve(
       this._repository
@@ -138,9 +121,7 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
         .values({
           firstName: firstName,
           lastName: lastName,
-          email: email,
-          password: password,
-          provider: provider,
+          credential: credential,
         })
         .execute()
         .then((result) => this.findUserByUuid({uuid: result.identifiers[0].uuid}))
@@ -158,12 +139,7 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
    */
   public updateUser(
     uuid: string,
-    {
-      firstName,
-      lastName,
-      deviceToken,
-      phoneNumber,
-    }: Partial<{firstName: string; lastName: string; phoneNumber: string; deviceToken: string}>,
+    {firstName, lastName, phoneNumber}: Partial<{firstName: string; lastName: string; phoneNumber: string}>,
   ): Promise<UserEntity> {
     return Promise.resolve(
       this._repository
@@ -173,7 +149,6 @@ export class UserRepository extends BaseAbstractRepository<UserEntity> {
           firstName: firstName,
           lastName: lastName,
           phoneNumber: phoneNumber,
-          deviceToken: deviceToken,
         })
         .where('uuid = :uuid', {uuid: uuid})
         .execute()

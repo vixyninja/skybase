@@ -1,15 +1,21 @@
 import {ConfigsModule} from '@/configs';
-import {UserEntity} from '@/entities';
+import {CredentialEntity, DeviceEntity, ExternalProviderEntity, UserEntity} from '@/entities';
+import {CredentialSubscriber} from '@/subscribers';
+import {TokenModule} from '@/token';
 import {Module} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {UserController} from './user.controller';
-import {UserRepository} from './user.repository';
-import {UserService} from './user.service';
+import {UserController} from './controllers';
+import {CredentialRepository, UserRepository} from './repositories';
+import {CredentialService, UserService} from './services';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity]), ConfigsModule],
+  imports: [
+    ConfigsModule,
+    TokenModule,
+    TypeOrmModule.forFeature([UserEntity, CredentialEntity, DeviceEntity, ExternalProviderEntity]),
+  ],
   controllers: [UserController],
-  providers: [UserRepository, UserService],
-  exports: [UserService],
+  providers: [UserRepository, CredentialRepository, UserService, CredentialService, CredentialSubscriber],
+  exports: [UserService, CredentialService],
 })
 export class UserModule {}

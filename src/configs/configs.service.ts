@@ -90,6 +90,15 @@ export class ConfigsService {
 
   /**
    *
+   * @returns {string} The current pass phrase
+   * @description This method returns the current pass phrase
+   */
+  public passPhrase(): string {
+    return this.configService.get<string>('PASS_PHRASE') as string;
+  }
+
+  /**
+   *
    * @returns {TypeOrmModuleOptions} The current postgres connection
    * @description This method returns the current postgres connection
    */
@@ -108,6 +117,7 @@ export class ConfigsService {
       subscribers: [__dirname + '/../**/*.subscriber{.ts,.js}'],
       entityPrefix: 'tbl_',
       connectTimeoutMS: 30000,
+      logging: true,
     };
   }
 

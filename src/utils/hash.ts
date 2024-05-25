@@ -5,9 +5,8 @@ import * as bycryptjs from 'bcryptjs';
  * @param {string} password
  * @returns {string}
  */
-export function hashPassword(password: string): string {
-  const saltRounds = bycryptjs.genSaltSync(10);
-  return saltRounds && bycryptjs.hashSync(password, saltRounds);
+export function hashPassword(password: string, saltRounds: number | string): string {
+  return bycryptjs.hashSync(password, saltRounds);
 }
 
 /**

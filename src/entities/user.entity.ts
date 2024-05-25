@@ -1,7 +1,7 @@
 import {BaseEntity} from '@/base';
-import {ProviderEnum, UserStatusEnum} from '@/enums';
-import {compareHash} from '@/utils';
+import {UserStatusEnum} from '@/enums';
 import {Column, Entity, Index, JoinColumn, OneToOne} from 'typeorm';
+import {CredentialEntity} from './credential.entity';
 import {FileEntity} from './file.entity';
 
 @Entity({
@@ -36,7 +36,8 @@ export class UserEntity extends BaseEntity {
   @Column({
     type: 'varchar',
     length: 225,
-    nullable: false,
+    nullable: true,
+    default: null,
     name: 'email',
     comment: 'Email for user',
   })
@@ -63,32 +64,30 @@ export class UserEntity extends BaseEntity {
   status: UserStatusEnum;
 
   @Column({
-    type: 'enum',
-    enum: ProviderEnum,
-    nullable: false,
-    name: 'provider',
-    comment: 'Provider of user (email, facebook, google, etc)',
+    name: 'last_ip',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+    comment: 'Last IP address',
   })
-  provider: ProviderEnum;
+  lastIp: string;
 
   @Column({
-    type: 'varchar',
-    length: 225,
-    default: null,
-    name: 'device_token',
-    comment: 'Device token for push notification',
+    name: 'last_login',
+    type: 'timestamp without time zone',
+    nullable: true,
+    comment: 'Last login',
   })
-  deviceToken: string;
+  lastLogin: Date;
 
   @Column({
-    type: 'varchar',
-    length: 225,
+    name: 'is_online',
+    type: 'boolean',
     nullable: false,
-    select: false,
-    name: 'password',
-    comment: 'Password for user (hash with bcrypt)',
+    comment: 'Is online',
+    default: false,
   })
-  password: string;
+  isOnline: boolean;
 
   // ! ############################# RELATION #############################
   @JoinColumn({
@@ -121,10 +120,15 @@ export class UserEntity extends BaseEntity {
   })
   background: FileEntity;
 
-  // * ############################# METHOD #############################
-  comparePassword(attempt: string): boolean {
-    return compareHash(attempt, this.password);
-  }
+  @OneToOne(() => CredentialEntity, (credential) => credential.uuid, {
+    cascade: true,
+    nullable: true,
+    eager: true,
+    lazy: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  credential: CredentialEntity;
 
   constructor(partial: Partial<UserEntity>) {
     super();

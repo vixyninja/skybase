@@ -1,14 +1,12 @@
 import {ConfigsService} from '@/configs';
 import {MessageConstant, VariableConstant} from '@/constants';
-import {UserEntity} from '@/entities';
+import {CredentialEntity, UserEntity} from '@/entities';
 import {AuthFindByEnum, ProviderEnum} from '@/enums';
 import {AccessTokenType, RefreshTokenType} from '@/interfaces';
-import {UserService} from '@/modules/user';
+import {CredentialService, UserService} from '@/modules/user/services';
 import {TokenService} from '@/token';
-import {compareHash} from '@/utils';
 import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/common';
 import {SecureConstant} from 'secure';
-import {generateFromEmail} from 'unique-username-generator';
 import {RegisterDTO} from './dto';
 
 @Injectable()
@@ -17,6 +15,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly configService: ConfigsService,
+    private readonly credentialService: CredentialService,
   ) {}
 
   /**
@@ -26,9 +25,13 @@ export class AuthService {
    */
   async validation({uuid}: AccessTokenType): Promise<any> {
     try {
+      if (!uuid) {
+        throw new BadRequestException(MessageConstant.INVALID_UUID);
+      }
+
       const user: UserEntity = await this.userService.findUserByType(uuid, AuthFindByEnum.UUID);
 
-      if (!uuid || !user) {
+      if (!user) {
         throw new UnauthorizedException(MessageConstant.TOKEN_INVALID);
       }
 
@@ -40,23 +43,24 @@ export class AuthService {
 
   /**
    *
-   * @param email
+   * @param username
    * @param password
    * @returns  This is method for authenticate user
    */
-  async authenticate(email: string, password: string): Promise<any> {
+  async authenticate(username: string, password: string): Promise<any> {
     try {
-      const user = await this.userService.findUserByType(email, AuthFindByEnum.EMAIL, true);
+      const credential: CredentialEntity = await this.credentialService.findCredentialWithPassword(username);
 
-      const isValid = compareHash(password, user.password);
+      const isValid = this.tokenService.comparePayload(password, credential.passwordHash);
 
-      if (!isValid || !user) {
+      if (!isValid) {
         throw new UnauthorizedException(MessageConstant.EMAIL_OR_PASSWORD_INCORRECT);
       }
 
+      const user: UserEntity = await this.userService.findUserByType(credential.uuid, AuthFindByEnum.REL_CREDENTIAL);
+
       const accessToken = await this.tokenService.signAsymmetricToken(
         {
-          email: user.email,
           uuid: user.uuid,
         },
         SecureConstant.ACCESS_TOKEN_PRIVATE,
@@ -143,15 +147,13 @@ export class AuthService {
    * @param payload RegisterDTO
    * @returns This is method for register user
    */
-  async register({email, password}: RegisterDTO): Promise<any> {
+  async register({loginName, password}: RegisterDTO): Promise<any> {
     try {
-      const uniqueName = generateFromEmail(email, 9);
-
       const user = await this.userService.createUser({
-        email: email,
+        loginName: loginName,
         password: password,
         firstName: VariableConstant.GUEST,
-        lastName: uniqueName,
+        lastName: VariableConstant.USER,
         provider: ProviderEnum.EMAIL,
       });
 
