@@ -1,6 +1,5 @@
 import {CredentialEntity} from '@/entities';
-import {compareHash, hashPassword} from '@/utils';
-import {Inject, Injectable} from '@nestjs/common';
+import {hashPassword} from '@/utils';
 import {EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent} from 'typeorm';
 
 @EventSubscriber()

@@ -113,8 +113,6 @@ export class UserEntity extends BaseEntity {
   @OneToOne(() => FileEntity, (media) => media.uuid, {
     cascade: true,
     nullable: true,
-    eager: true,
-    lazy: false,
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
@@ -123,8 +121,6 @@ export class UserEntity extends BaseEntity {
   @OneToOne(() => CredentialEntity, (credential) => credential.uuid, {
     cascade: true,
     nullable: true,
-    eager: true,
-    lazy: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
